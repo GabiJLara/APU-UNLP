@@ -1,0 +1,196 @@
+program Ejercicio3;
+
+type
+    Empleado = record
+        codigo: integer;
+        apellido: String;
+        nombre: String;
+        edad: integer;
+        DNI: integer;
+    end;
+
+    empleados = file of Empleado;
+
+var
+    archivo_logico: empleados;
+    carga: Text;
+    opc: char;
+    empleadoTemp,emp: Empleado;
+    nomArch,aux,num: String;
+    n,cod: integer;
+    agregar,modificado: boolean; 
+
+    procedure Menu(); // Imprime el menu principal
+    begin
+        Writeln ('-------Bienvenido al menu de opciones-----');
+        Writeln ('- Opcion A- "Crear un archivo de Empleados"');
+        Writeln ('- Opcion B- "Abrir el archivo generado y sacar informacion"');
+        Writeln ('- Opcion C- "Terminar"');
+        Writeln ('Ingrese una opcion');
+        Readln(opc);
+    end;
+
+    procedure Menu2(); // Imprime el menu de la opcion B
+    begin
+        writeln('Puede hacer lo siguiente con el archivo :');
+        writeln('Opcion 1: Listar en pantalla empleados que tengan un nombre o apellido especifico');
+        writeln('Opcion 2: Listar en pantalla todos los empleados');
+        writeln('Opcion 3: Listar en pantalla los empleados mayores de 70 anios (Se viene jubilacion?)');
+        writeln('Opcion 4: Agregar empleado');
+        writeln('Opcion 5: Modificar edad de un empleado');
+        writeln('Opcion 6: Exportar contenido del archivo a un archivo llamado "todos_empleados.txt"');
+        writeln('Opcion 7: Exportar un archivo de texto con los empleados que no se les haya cargado el DNI llamado "faltaDNIempleado.txt" ');
+        writeln('En caso de poner otra opcion regresara al menu principal');
+        readln(num);
+    end;
+
+    procedure CargarEmpleado(var E: empleado); // Carga empleados
+    begin
+        writeln('Ingrese Apellido del empleado');
+        readln(E.apellido);
+        if (E.apellido <> 'fin') then begin
+            writeln('Ingrese Nombre del empleado: ');
+            readln(E.nombre);
+            writeln('Ingrese Codigo del empleado: ');
+            readln(E.codigo);
+            writeln('Ingrese Edad del empleado: ');
+            readln(E.edad);
+            writeln('Ingrese DNI del empleado: ');
+            readln(E.DNI);
+        end;
+    end;
+
+    procedure ImprimirEmpleado(E: empleado); // Imprime empleados
+    begin
+        Writeln('---DATO EMPLEADO---');
+        writeln('Nombre: ', E.nombre);
+        writeln('Apellido: ', E.apellido);
+        writeln('DNI: ', E.DNI);
+        writeln('Codigo de empleado: ', E.codigo);
+        writeln('Edad: ', E.edad);
+    end;
+
+begin
+    Menu;
+    While (opc <> 'C')do begin
+        if(opc='A') then begin  //Pregunta si es la opcion A y arranca a crear un archivo
+            writeln('Ingrese ruta del archivo: ');
+            readln(nomArch);
+            assign(archivo_logico, nomArch);
+            rewrite(archivo_logico);
+            CargarEmpleado(empleadoTemp);
+            while (empleadoTemp.apellido <> 'fin') do begin // Condicion de corte
+                write(archivo_logico, empleadoTemp);
+                CargarEmpleado(empleadoTemp);
+            end;
+            close(archivo_logico);  // NO OLVIDARSE DE CERRAR EL ARCHIVO LUEGO DE CREARLO
+            writeln('--- Fin de La carga del archivo ---');
+        end
+        else if(opc = 'B') then begin //Pregunta si es la opcion B para trabajar sobre un archivo creado
+            Menu2;
+            reset(archivo_logico); // RESETEA EL ARCHIVO ASI CUANDO LO LEE ARRANCA DEL PRINCIPIO
+            if (num = '1')then begin
+                writeln('Ingrese nombre o apellido');
+                readln(aux);
+                while not EOF(archivo_logico) do begin
+                    read(archivo_logico, empleadoTemp);
+                    if (empleadoTemp.nombre = aux) or (empleadoTemp.apellido = aux) then
+                        ImprimirEmpleado(empleadoTemp);
+                end;
+            end
+            else if (num = '2')then begin
+                while not EOF(archivo_logico) do begin
+                    read(archivo_logico,empleadoTemp);
+                    ImprimirEmpleado(empleadoTemp);
+                end;
+            end
+            else if (num = '3') then begin
+                n:= 0;  // USO UN CONTADOR PARA SABER SI HAY EMPLEADOS MAYORES DE 70
+                while not EOF(archivo_logico) do begin
+                    read(archivo_logico,empleadoTemp);
+                    if(empleadoTemp.edad > 70) then begin
+                        ImprimirEmpleado(empleadoTemp);
+                        n:= n + 1;
+                    end;
+                end;
+                if ( n = 0)then begin // Si no crecio el contador claramente no hay empleados mayores de 70
+                    writeln('----NO HAY EMPLEADOS MAYORES DE 70---');
+                end;
+            end
+            else if (num = '4') then begin
+                CargarEmpleado(empleadoTemp);
+                while (empleadoTemp.apellido <> 'fin') do begin
+                    agregar:= true;
+                    reset(archivo_logico);
+                    while (agregar) and not EOF(archivo_logico) do begin
+                        read(archivo_logico, emp);
+                        if (empleadoTemp.codigo = emp.codigo) then
+                            agregar:= false;
+                    end;
+                    if (empleadoTemp.apellido = 'fin')then
+                        close(archivo_logico)
+                    else 
+                        if (agregar) then begin
+                            write(archivo_logico, empleadoTemp);
+                            writeln('--CARGADO CORRECTAMENTE--');
+                            CargarEmpleado(empleadoTemp);
+                        end
+                    else begin
+                        writeln('---Codigo de empleado repetido, cambie el codigo---');
+                        CargarEmpleado(empleadoTemp);
+                    end;
+                end;
+            end
+            else if (num = '5') then begin
+                writeln('Ingrese codigo de empleado que desea modificar edad');
+                read(cod);
+                modificado:= true;
+                while not EOF(archivo_logico) and (modificado) do begin
+                    read(archivo_logico, emp);
+                    if (emp.codigo = cod)then begin
+                        writeln('Ingrese edad del empleado');
+                        readln(emp.edad);
+                        seek(archivo_logico, filepos(archivo_logico)-1);
+                        write(archivo_logico, emp);
+                        writeln('--Edad modificada correctamente, volvera al menu principal--');
+                        modificado:= false;
+                    end
+                end;
+                if (modificado) then
+                    writeln('--El empleado con ese codigo no se encontro, volvera al menu principal--');
+            end
+            else if (num = '6') then begin
+                assign(carga, 'todos_empleados.txt');
+                Rewrite(carga);
+                while not EOF(archivo_logico) do begin
+                    read(archivo_logico, empleadoTemp);
+                    with empleadoTemp do 
+                        writeln(carga, ' Codigo: ', codigo, ' Apellido: ', apellido, ' Nombre: ', nombre, ' Edad: ', edad, ' DNI: ', DNI);
+                end;
+                close(carga);
+                writeln('"todos_empleados.txt" creado correctamente');
+            end
+            else if (num = '7') then begin
+                assign(carga, 'faltaDNIempleado.txt');
+                Rewrite(carga);
+                while not EOF(archivo_logico) do begin
+                    read(archivo_logico, empleadoTemp);
+                    if (empleadoTemp.DNI = 00) then 
+                        with empleadoTemp do 
+                            writeln(carga, ' Codigo: ', codigo, ' Apellido: ', apellido, ' Nombre: ', nombre, ' Edad: ', edad, ' DNI: ', DNI);
+                end;
+                close(carga);
+                writeln('"faltaDNIempleado.txt" creado correctamente');
+            end
+            else begin 
+                writeln('NO ELIGIO OPCION CORRECTA'); //Debe regresar al menu principal
+            end;
+            close(archivo_logico); // Aunque lo haya leido nada mas igualmente cerramos el archivo
+        end
+        else begin 
+            writeln('OPCION INCORRECTA INGRESE NUEVAMENTE');
+        end;
+        Menu; //Si se ingresa un caracter distinto de A,B o C vuelve al menu del principio
+    end; 
+    writeln('---TERMINAR PROGRAMA---');
+end.
