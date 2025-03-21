@@ -1,0 +1,31 @@
+program Ejercicio2;
+
+type
+    archivo = file of integer;
+
+var
+    n, numsMen, total: integer;
+    archivo_logico: archivo;
+    nomArch: string;
+begin
+    writeln('Ingrese ruta del archivo a leer: ');
+    read(nomArch); // ..\Ej1\Archivo_De_Enteros
+    assign(archivo_logico, nomArch);
+    reset(archivo_logico); //reiniciamos el archivo para que se lea desde el principio
+    while not EOF(archivo_logico) do begin  //Imprimo todo el contenido del archivo (Para comprobar)
+        read(archivo_logico,n);
+        writeln(n);
+    end;
+    numsMen := 0;
+    total := 0;
+    reset(archivo_logico); //Reinicio denuevo
+    while not EOF(archivo_logico) do begin //Arrancamos a recorrer el archivo buscando lo que pide el ejercicio
+    read(archivo_logico, n);
+        if (n < 1500) then
+            numsMen := numsMen + 1;
+        total := total + n;
+    end;
+    writeln('Cantidad de números menores a 1500: ', numsMen);
+    writeln('Promedio: ', (total / FileSize(archivo_logico)):0:2);
+    close(archivo_logico);
+end.
