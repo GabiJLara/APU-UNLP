@@ -1,0 +1,9 @@
+1234 1000.99 Samsung
+50 10 Reparacion
+"Samsung Galaxy S21"
+5678 799.50 LG
+0 5 'Smartphone LG'
+"LG G6"
+1 250.30 Apple
+0 25 "Celular de la manzana"
+Iphone 11
