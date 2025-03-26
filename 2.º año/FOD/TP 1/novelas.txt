@@ -1,0 +1,10 @@
+001 150.00 CienciaFicción
+El Eternauta
+002 200.00 Drama
+Martín Fierro
+003 120.00 Aventura
+Don Segundo Sombra
+004 180.00 Misterio
+El túnel
+005 250.00 Fantasía
+Cien años de soledad
