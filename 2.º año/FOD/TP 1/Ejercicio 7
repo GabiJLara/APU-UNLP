@@ -1,0 +1,127 @@
+program Ejercicio7;
+
+type
+    novela = record
+        codigo: integer;
+        precio: real;
+        genero: String;
+        nombre: string;
+    end;
+
+    novelas = file of novela;
+
+var
+    archivo_logico: novelas;
+    carga: Text;
+    nomArch,opc: String;
+    novelaTemp,nov: novela;
+    n: integer;
+    aux: boolean;
+    nuevoPrecio: real;
+
+    procedure Menu();
+    begin
+        Writeln ('---------------------------------------------------------------------------------------------------------------------------------------------');
+        writeln ('|                                  BIENVENIDO AL MENU DE OPCIONES                                                                           |');
+        writeln ('|                                                                                                                                           |');
+        Writeln ('|- Opcion 1-  Crear un archivo de novelas y cargarlo con datos ingresados desde un archivo de texto denominado “novelas.txt”                |');
+        Writeln ('|- Opcion 2-  Agregar una novela al archivo                                                                                                 |');
+        Writeln ('|- Opcion 3-  Modificar novela existente                                                                                                    |');
+        Writeln ('|- Opcion 4- "Terminar"                                                                                                                     |');
+        Writeln ('--------------------------------------------------------------------------------------------------------------------------------------------|');
+        Writeln (' INGRESE UNA OPCION:');
+        Readln(opc);
+    end;
+
+    procedure leerNovela(var N: novela);
+    begin
+        writeln('Inserte codigo novela: ');
+        readln(N.codigo);
+        writeln('Inserte precio: ');
+        readln(N.precio);
+        writeln('Inserte genero: ');
+        readln(N.genero);
+        writeln('Inserte nombre: ');
+        readln(N.nombre);
+    end;
+
+begin
+    writeln;
+    writeln;
+    writeln('Ingrese nombre del archivo binario');
+    readln(nomArch);
+    assign(archivo_logico, nomArch);
+    Menu;
+    while (opc <> '4') do begin
+        if (opc = '1') then begin
+            assign(carga, 'novelas.txt');
+            rewrite(archivo_logico);
+            reset(carga);
+            while not EOF(carga) do begin
+                with novelaTemp do begin
+                    readln(carga, codigo, precio, genero);
+                    readln(carga, nombre);
+                end;
+                write(archivo_logico, novelaTemp);
+            end;
+            close(archivo_logico);
+            close(carga);
+            writeln(' -----------------------------');
+            writeln('|Archivo cargado correctamente|');
+            writeln('|Volvera al menu principal    |');
+            writeln(' -----------------------------');
+        end
+        else if(opc = '2') then begin
+            leerNovela(novelaTemp);
+            reset(archivo_logico);
+            aux:=true;
+            while not EOF(archivo_logico) do begin
+                read(archivo_logico,nov);
+                if (novelaTemp.codigo = nov.codigo) then
+                    aux:= false;
+            end;
+            if(aux) then begin
+                seek(archivo_logico, FileSize(archivo_logico));
+                write(archivo_logico, novelaTemp);
+                writeln('CARGADO CORRECTAMENTE')
+            end
+            else
+                writeln('CODIGO REPETIDO NO SE CARGO');
+            close(archivo_logico);
+        end
+        else if(opc = '3') then begin
+            writeln('Ingrese codigo de novela a modificar: ');
+            readln(n);
+            reset(archivo_logico);
+            aux:= true;
+            while not EOF(archivo_logico) and (aux) do begin
+                read(archivo_logico, novelaTemp);
+                if(novelaTemp.codigo = n) then begin
+                    writeln('Ingrese nuevo precio de la novela: ');
+                    readln(nuevoPrecio);
+                    novelaTemp.precio:= nuevoPrecio;
+                    seek(archivo_logico, filepos(archivo_logico)-1);
+                    write(archivo_logico,novelaTemp);
+                    aux:= false
+                end;
+            end;
+            if(aux) then
+                writeln('No se encontro la novela con ese codigo')
+            else
+                writeln('MODIFICADO CORRECTAMENTE');
+        end
+        else
+            writeln('OPCION INCORRECTA');
+        Menu;
+    end;
+    reset(archivo_logico);
+    while not EOF(archivo_logico) do begin
+        read(archivo_logico, novelaTemp);
+        writeln('---------------');
+        writeln('Codigo: ', novelaTemp.codigo);
+        writeln('Precio: ', novelaTemp.precio:0:2);
+        writeln('Genero: ', novelaTemp.genero);
+        writeln('Nombre: ', novelaTemp.nombre);
+    end;
+    close(archivo_logico);
+end.
