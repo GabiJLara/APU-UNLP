@@ -1,0 +1,196 @@
+program Ejercicio5;
+
+type
+    celular = record
+        codigo: integer;
+        nombre: String;
+        descripcion: String;
+        marca: String;
+        precio: real;
+        stockMinimo: integer;
+        stockDisponible: integer;
+    end;
+
+    celulares = file of celular;
+
+var
+    archivo_logico: celulares;
+    carga: Text;
+    opc,desc,n,nomb: String;
+    nomArch: String;
+    celularTemp, celu: celular;
+    aux: boolean;
+    numero: integer;
+
+  procedure Menu(); // Imprime el menu principal
+    begin
+        Writeln ('---------------------------------------------------------------------------------------------------------------------------------------------');
+        writeln ('|                                  BIENVENIDO AL MENU DE OPCIONES                                                                           |');
+        writeln ('|                                                                                                                                           |');
+        Writeln ('|- Opcion 1- "Crear un archivo de celulares y cargarlo con datos ingresados desde un archivo de texto denominado “celulares.txt”."          |');
+        Writeln ('|- Opcion 2- "Listar en pantalla los datos de aquellos celulares que tengan un stock menor al stock mínimo."                                |');
+        Writeln ('|- Opcion 3- "Listar en pantalla los celulares del archivo cuya descripción contenga una cadena de caracteres proporcionada por el usuario."|');
+        Writeln ('|- Opcion 4- "Exportar el archivo creado en el inciso a"                                                                                    |');
+        Writeln ('|- Opcion 5- "Añadir uno o más celulares al final del archivo con sus datos ingresados por teclado."                                        |');
+        Writeln ('|- Opcion 6- "Modificar el stock de un celular dado."                                                                                       |');
+        Writeln ('|- Opcion 7- "Exportar el contenido del archivo binario a un archivo de texto: ”SinStock.txt”, con aquellos celulares que tengan stock 0."  |');
+        Writeln ('|- Opcion 8- "Terminar"                                                                                                                     |');
+        Writeln ('--------------------------------------------------------------------------------------------------------------------------------------------|');
+        Writeln (' INGRESE UNA OPCION:');
+        Readln(opc);
+    end;
+
+    procedure ImprimirCelular(c: celular); // Imprime empleados
+    begin
+        Writeln('---DATO CELULAR---');
+        writeln('Nombre: ',c.nombre);
+        writeln('Codigo: ',c.codigo);
+        writeln('Descripcion: ',c.descripcion);
+        writeln('Marca: ',c.marca);
+        writeln('Precio: ',c.precio:0:2);
+        writeln('Stock Disponible: ',c.stockDisponible);
+        writeln('Stock minimo: ',c.stockMinimo);
+    end;
+
+    procedure LeerCelular(var c: celular);
+    begin
+        writeln('Ingrese codigo de celular: ');
+        readln(c.codigo);
+        writeln('Ingrese precio: ');
+        readln(c.precio);
+        writeln('Ingrese marca: ');
+        readln(c.marca);
+        writeln('Ingrese Stock disponible: ');
+        readln(c.stockDisponible);
+        writeln('Ingrese stock minimo: ');
+        readln(c.stockMinimo);
+        writeln('Ingrese descripcion: ');
+        readln(c.descripcion);
+        writeln('Ingrese nombre del celular: ');
+        readln(c.nombre);
+    end;
+
+begin
+    writeln;
+    writeln;
+    writeln('Ingrese nombre del archivo binario');
+    readln(nomArch);
+    assign(archivo_logico, nomArch);
+    Menu;
+    while (opc <> '8') do begin
+        if (opc = '1') then begin
+            assign(carga,'celulares.txt');
+            reset(carga);
+            rewrite(archivo_logico);
+            while not EOF(carga) do begin
+                with celularTemp do begin
+                    readln(carga, codigo, precio, marca);
+                    readln(carga, stockDisponible, stockMinimo, descripcion);
+                    readln(carga, nombre);
+                end;
+                write(archivo_logico, celularTemp);
+            end;
+            close(archivo_logico);
+            close(carga);
+            writeln(' -----------------------------');
+            writeln('|Archivo cargado correctamente|');
+            writeln('|Volvera al menu principal    |');
+            writeln(' -----------------------------');
+        end
+        else if (opc = '2') then begin
+            reset(archivo_logico);
+            while not EOF(archivo_logico) do begin
+                read(archivo_logico, celu);
+                if (celu.stockMinimo > celu.stockDisponible) then
+                    ImprimirCelular(celu);
+            end;
+
+            close(archivo_logico)
+        end
+        else if (opc = '3') then begin
+            writeln('INGRESE DESCRIPCION A BUSCAR:');
+            readln(desc);
+            writeln();
+            writeln;
+            reset(archivo_logico);
+            aux:= true;
+            while not EOF(archivo_logico) do begin
+                read(archivo_logico, celu);
+                if (celu.descripcion = desc) then begin
+                    ImprimirCelular(celu);
+                    aux:= false;
+                end;
+            end;
+            if (aux) then
+                writeln('NO HAY CELULARES CON ESA DESCRIPCION');
+            close(archivo_logico);
+        end
+        else if (opc = '4') then begin
+            assign(carga,'celulares.txt');
+            reset(archivo_logico);
+            rewrite(carga);
+            while not EOF(archivo_logico) do begin
+                read(archivo_logico, celularTemp);
+                with celularTemp do
+                    writeln(carga ,codigo,' ',precio:0:2,' ',marca, 
+                    #10 ,stockDisponible, ' ',stockMinimo,' ',descripcion,
+                    #10,nombre);
+            end;
+            writeln('ARCHIVO DE TEXTO CREADO EXITOSAMENTE');
+            close(archivo_logico);
+            close(carga);
+        end
+        else if (opc = '5') then begin
+            reset(archivo_logico);
+            writeln('Quiere agregar celular? Ingrese 1 de ser afirmativo, cualquier otra cosa lo llevara al menu principal:');
+            readln(n);
+            while (n = '1') do begin
+                LeerCelular(celularTemp);
+                seek(archivo_logico, FileSize(archivo_logico));
+                write(archivo_logico, celularTemp);
+                writeln('Celular cargado correctamente');
+                writeln('Quiere agregar otro celular? 1 para afirmativo, todo lo demas volvera al menu principal: ');
+                readln(n);
+            end;
+            close(archivo_logico);
+        end
+        else if(opc = '6') then begin
+            Writeln('Inserte nombre del celular a modificar stock');
+            readln(nomb);
+            reset(archivo_logico);
+            aux:= true;
+            while not EOF(archivo_logico) do begin
+                read(archivo_logico, celularTemp);
+                if(celularTemp.nombre = nomb) then begin
+                    writeln('Ingrese nuevo stock del celular: ');
+                    readln(numero);
+                    celularTemp.stockDisponible := numero;
+                    seek(archivo_logico, filepos(archivo_logico)-1);
+                    write(archivo_logico, celularTemp);
+                    writeln('STOCK MODIFICADO CORRECTAMENTE');
+                    aux:= false;
+                end 
+            end;
+            if (aux) then
+                writeln('No se encontro el celular con ese nombre');  
+            close(archivo_logico);
+        end
+        else if (opc = '7') then begin
+            reset(archivo_logico);
+            assign(carga, 'SinStock.txt');
+            rewrite(carga);
+            while not EOF(archivo_logico) do begin
+                read(archivo_logico, celularTemp);
+                if(celularTemp.stockDisponible = 0) then
+                    with celularTemp do
+                        writeln(carga ,'Codigo: ',codigo,' Precio: ',precio:0:2,' Marca:',marca,' Stock Disponible: ',stockDisponible, ' Stock Minimo: ',stockMinimo,' Descripcion:',descripcion,' Nombre: ',nombre);
+            end;
+            close(carga);
+            close(archivo_logico);
+        end
+        else
+            writeln('OPCION INCORRECTA');
+        Menu;
+    end;
+    writeln('--Terminar Programa--');
+end.
