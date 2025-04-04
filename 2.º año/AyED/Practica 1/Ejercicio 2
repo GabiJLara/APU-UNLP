@@ -1,12 +1,19 @@
 package practica1;
 
+import java.util.Scanner;
+
 public class Arreglo {
 	
 	public static void main(String[] args) {
-        int[] vector = devolverArreglo(3); // Llamada con un numero positivo
+		Scanner s = new Scanner(System.in);
+		System.out.println("Por favor, ingresa un valor para N: ");
+        int N = s.nextInt();
+        int[] vector = devolverArreglo(N); // Llamada con un numero positivo
         for (int i : vector) {
             System.out.println(i);  
         }
+        System.out.println("Por favor, ingresa un valor para N: ");
+        N = s.nextInt();
         System.out.println("-----");
         int[] vector2 = devolverArreglo(-3); // Llamada con un numero negativo
         for (int i : vector2) {
