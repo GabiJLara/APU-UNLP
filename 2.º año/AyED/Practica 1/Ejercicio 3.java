@@ -37,6 +37,7 @@ public class Test {
 		arrProfesor[2].setEmail("Tercero");
 		arrProfesor[2].setFacultad("Tercero");
 		System.out.println("ESTUDIANTES: ");
+
 		
 		for (int i=0;i<2;i++) {	
 			System.out.println(arrEstudiante[i].tusDatos());
