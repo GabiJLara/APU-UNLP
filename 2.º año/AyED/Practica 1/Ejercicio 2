@@ -19,6 +19,7 @@ public class Arreglo {
         for (int i : vector2) {
             System.out.println(i);  
         }
+	s.close();
     }
 	public static int[] devolverArreglo(int N) {
 		int[]arreglo;
