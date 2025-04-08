@@ -14,11 +14,21 @@ public class Stack <T>{
 	}
 	
 	public T pop () {
-		return(lista.remove(lista.size()-1));
+		if (!isEmpty()) {
+			return(lista.remove(lista.size()-1));
+        	}
+		else {
+			throw new IllegalStateException("La pila está vacía");
+		}
 	}
 	
 	public T top() {
-		return(lista.get(lista.size()-1));
+		if(!isEmpty()) {
+			return(lista.get(lista.size()-1));
+		}
+		else {
+			throw new IllegalStateException("La pila está vacía");
+		}
 	}
 	
 	public int size() {
