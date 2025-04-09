@@ -8,7 +8,7 @@ type
     end;
 
     arComisiones = file of comision;
-
+    
 var
     archivo: arComisiones;
     reg: comision;
