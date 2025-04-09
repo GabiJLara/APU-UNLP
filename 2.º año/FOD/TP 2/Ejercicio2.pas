@@ -96,7 +96,7 @@ begin
         write(maestro, reg);   //SOBRE ESCRIBIMOS EL PRODUCTO CON EL DATO MODIFICADO
     end;
 
-    ultimoElemento(); //SE HACE AFUERA EL ULTIMO ELEMENTO POR QUE SOY UN BOLUDO(?)
+    ultimoElemento(); //SE HACE AFUERA EL ULTIMO ELEMENTO POR QUE SOY UN BOLUDO(?) Efectivamente si me falto hacer en lectura asignar cod = maxInt;
     close(detalle);
     close(maestro);
     // Esta parte es para imprimir nada mas y saber si se modifico bien
