@@ -14,7 +14,7 @@ var
     reg: comision;
     i: integer;
     codigoStr: string;
-
+ 
 begin
     assign(archivo, 'Comisiones.dat');
     rewrite(archivo);  // Crear y abrir el archivo para escritura
