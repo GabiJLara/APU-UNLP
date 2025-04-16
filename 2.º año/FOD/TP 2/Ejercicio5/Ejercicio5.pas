@@ -70,7 +70,7 @@ var
         minFecha:= valorAlto;
         for i:= 1 to cantDetalles do
         begin
-            if((a[i].cod_usuario < min) and (a[i].fecha < minFecha))then
+            if((a[i].cod_usuario < min) or ((a[i].cod_usuario = min) and (a[i].fecha < minFecha)))then
             begin
                 min:= a[i].cod_usuario;
                 minFecha:= a[i].fecha;
