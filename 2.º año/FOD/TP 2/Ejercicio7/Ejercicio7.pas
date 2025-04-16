@@ -57,6 +57,26 @@ var
             e.codMateria:= valorAlto;
     end;
 
+    procedure procesarCursadas();
+    begin
+        while(cur.codAlumno = aux)do
+        begin
+            if(cur.resultado)then
+                cantMaterias:= cantMaterias + 1;
+            leerD1(detail1,cur);
+        end;
+    end;
+
+    procedure procesarExamenes();
+    begin
+        while(exam.codAlumno = aux)do
+        begin
+            if(exam.nota >= 4)then
+                cantExamenes:= cantExamenes + 1;
+            leerD2(detail2, exam);
+        end;
+    end;
+
 begin
     assign(master, 'AlumnosFdI.dat');
     reset(master);
@@ -73,38 +93,18 @@ begin
         if(cur.codAlumno = exam.codAlumno)then
         begin
             aux:= cur.codAlumno;
-            while(cur.codAlumno = aux)do
-            begin
-                if(cur.resultado)then
-                    cantMaterias:= cantMaterias + 1;
-                leerD1(detail1,cur);
-            end;
-            while(exam.codAlumno = aux)do
-            begin
-                if(exam.nota >= 4)then
-                    cantExamenes:= cantExamenes + 1;
-                leerD2(detail2, exam);
-            end;
+            procesarCursadas();
+            procesarExamenes();
         end
         else if(cur.codAlumno < exam.codAlumno)then
         begin
             aux:= cur.codAlumno;
-            while(cur.codAlumno = aux)do
-            begin
-                if(cur.resultado)then
-                    cantMaterias:= cantMaterias + 1;
-                leerD1(detail1,cur);
-            end;
+            procesarCursadas();
         end
         else if(cur.codAlumno > exam.codAlumno) then
         begin
             aux:= exam.codAlumno;
-            while(exam.codAlumno = aux) do
-            begin
-                if(exam.nota >= 4)then
-                    cantExamenes:= cantExamenes + 1;
-                leerD2(detail2, exam);
-            end;
+            procesarExamenes();
         end;
         read(master, alum);
         while(aux <> alum.codAlumno)do
@@ -120,3 +120,4 @@ begin
     close(detail1);
     close(detail2);
 end.
+
